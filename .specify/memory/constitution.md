@@ -2,8 +2,8 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version change: 1.0.1 → 1.0.2 (PATCH — removed misplaced implementation
-  mandates from Technology Constraints; kept only governance-level rules)
+  Version change: 1.0.2 → 1.0.3 (PATCH — Principle I: added explicit
+  dev/test carve-out; production-only scope now unambiguous)
 
   Modified principles:
     - Principle I (MCP-Native Interface): clarified that the restriction
@@ -54,26 +54,32 @@
 
 ### I. MCP-Native Interface
 
-The **user-facing external interface** MUST be exclusively MCP tools and
-resources. No parallel REST API, embedded web server, or alternative
-client-facing network interface is permitted unless explicitly ratified as
+In **production**, the user-facing external interface MUST be exclusively
+MCP tools and resources. No parallel REST API or alternative client-facing
+network interface is permitted in production unless explicitly ratified as
 a constitutional amendment.
+
+In **development and testing**, a local HTTP server exposing the service
+layer is permitted and encouraged. It enables Postman collections, contract
+documentation, and independent validation of business logic before the MCP
+layer is built. This test harness MUST NOT be shipped or reachable in
+production deployments.
 
 Internally, MCP tools MUST delegate to a clean service layer (business
 logic, timer services, persistence adapters). That service layer MAY make
-outbound HTTP/API calls to external services where necessary (e.g., future
-calendar or notification integrations), subject to Principle IV
-(Local-First & Privacy) governing what data leaves the device.
+outbound HTTP/API calls to external services where necessary, subject to
+Principle IV (Local-First & Privacy).
 
 MCP tool schemas MUST be versioned and documented. Breaking changes to a
 tool's input/output schema MUST trigger a MAJOR version bump of the
 affected tool.
 
-**Rationale**: MCP is a *transport protocol*, not a replacement for sound
-internal architecture. The principle bars a redundant user-facing REST API
-(which would split the interface surface), not the internal service layer
-that MCP tools call into. Clean layering — MCP handler → service →
-persistence — is required, not forbidden.
+**Rationale**: MCP is a transport protocol, not a replacement for sound
+internal architecture. The production restriction bars a redundant
+user-facing REST API that splits the interface surface and doubles
+maintenance burden. The dev/test carve-out recognises that a Postman
+collection over the service layer is the most practical way to document
+and validate contracts before wrapping them in MCP.
 
 ### II. Timer Correctness (NON-NEGOTIABLE)
 
@@ -184,4 +190,4 @@ confirmation (pass / justified violation) in its description. The
 `speckit.analyze` command MUST be run and its output attached or
 summarised before merge approval.
 
-**Version**: 1.0.2 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
+**Version**: 1.0.3 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
