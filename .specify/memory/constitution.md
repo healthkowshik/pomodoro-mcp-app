@@ -2,10 +2,12 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version change: [placeholder] → 1.0.0 (initial ratification)
+  Version change: 1.0.0 → 1.0.1 (PATCH — clarified Principle I scope)
 
   Modified principles:
-    - All five principles: newly defined (no prior version)
+    - Principle I (MCP-Native Interface): clarified that the restriction
+      applies to user-facing external interfaces only; internal service
+      layers and outbound API calls are explicitly permitted.
 
   Added sections:
     - Core Principles (I–V)
@@ -45,15 +47,26 @@
 
 ### I. MCP-Native Interface
 
-All functionality MUST be exposed exclusively as MCP tools and resources.
-No REST API, embedded web server, or alternative network interface is
-permitted unless explicitly ratified as a constitutional amendment. MCP
-tool schemas MUST be versioned and documented. Breaking changes to a tool's
-input/output schema MUST trigger a MAJOR version bump of the affected tool.
+The **user-facing external interface** MUST be exclusively MCP tools and
+resources. No parallel REST API, embedded web server, or alternative
+client-facing network interface is permitted unless explicitly ratified as
+a constitutional amendment.
 
-**Rationale**: The app's value is its tight integration with Claude AI
-via the Model Context Protocol. Introducing parallel interfaces fragments
-the surface area and creates maintenance burden without proportional benefit.
+Internally, MCP tools MUST delegate to a clean service layer (business
+logic, timer services, persistence adapters). That service layer MAY make
+outbound HTTP/API calls to external services where necessary (e.g., future
+calendar or notification integrations), subject to Principle IV
+(Local-First & Privacy) governing what data leaves the device.
+
+MCP tool schemas MUST be versioned and documented. Breaking changes to a
+tool's input/output schema MUST trigger a MAJOR version bump of the
+affected tool.
+
+**Rationale**: MCP is a *transport protocol*, not a replacement for sound
+internal architecture. The principle bars a redundant user-facing REST API
+(which would split the interface surface), not the internal service layer
+that MCP tools call into. Clean layering — MCP handler → service →
+persistence — is required, not forbidden.
 
 ### II. Timer Correctness (NON-NEGOTIABLE)
 
@@ -162,4 +175,4 @@ confirmation (pass / justified violation) in its description. The
 `speckit.analyze` command MUST be run and its output attached or
 summarised before merge approval.
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
+**Version**: 1.0.1 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
