@@ -2,12 +2,19 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version change: 1.0.0 → 1.0.1 (PATCH — clarified Principle I scope)
+  Version change: 1.0.1 → 1.0.2 (PATCH — removed misplaced implementation
+  mandates from Technology Constraints; kept only governance-level rules)
 
   Modified principles:
     - Principle I (MCP-Native Interface): clarified that the restriction
       applies to user-facing external interfaces only; internal service
       layers and outbound API calls are explicitly permitted.
+
+  Modified sections:
+    - Technology Constraints: stripped language/runtime/SDK/file-format
+      mandates (those belong in plan.md Technical Context). Retained only
+      the governance-level constraint: no paid external service dependencies.
+      Project default (Python + FastMCP) recorded as a note, not a mandate.
 
   Added sections:
     - Core Principles (I–V)
@@ -119,16 +126,18 @@ MCP pattern for server-side output.
 
 ## Technology Constraints
 
-The implementation MUST use the official MCP TypeScript SDK (or an
-equivalent officially supported SDK if the project language changes via
-constitutional amendment). Runtime MUST be Node.js ≥ 20 LTS (or Bun ≥ 1.0
-as a drop-in replacement). Local persistence MUST use a file-based store
-(JSON or SQLite) with no external database process dependency. No runtime
-dependency MUST require a paid external service.
+Language, runtime, SDK, and persistence choices are **implementation
+decisions** made per-feature in `plan.md` (Technical Context section), not
+governance mandates. They evolve as the project does.
 
-Test tooling MUST be selected per-feature in the plan; the default is
-Vitest for TypeScript projects. All tests MUST be runnable with a single
-command from the repository root.
+The one governance-level constraint: no runtime dependency MUST require a
+paid external service. This is a principled stance against vendor lock-in
+and cost unpredictability, not a technical preference.
+
+> **Project default** (record for plan.md authors): Python with the
+> FastMCP v3.0 library. All tests MUST be runnable with a single command from
+> the repository root. Deviations from the default MUST be documented in
+> the relevant `plan.md`.
 
 ## Development Workflow
 
@@ -175,4 +184,4 @@ confirmation (pass / justified violation) in its description. The
 `speckit.analyze` command MUST be run and its output attached or
 summarised before merge approval.
 
-**Version**: 1.0.1 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
+**Version**: 1.0.2 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
