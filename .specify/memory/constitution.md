@@ -2,13 +2,15 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version change: 1.0.2 → 1.0.3 (PATCH — Principle I: added explicit
-  dev/test carve-out; production-only scope now unambiguous)
+  Version change: 1.0.3 → 1.1.0 (MINOR — Principle I fundamentally
+  redefined: REST API is now a first-class production interface alongside
+  MCP; both are adapters over a shared service layer)
 
   Modified principles:
-    - Principle I (MCP-Native Interface): clarified that the restriction
-      applies to user-facing external interfaces only; internal service
-      layers and outbound API calls are explicitly permitted.
+    - Principle I renamed: "MCP-Native Interface" → "Service-First
+      Architecture". REST API is now a first-class production transport,
+      not a dev/test-only tool. Business logic MUST live exclusively in
+      the service layer; MCP and REST are thin adapters over it.
 
   Modified sections:
     - Technology Constraints: stripped language/runtime/SDK/file-format
@@ -52,34 +54,32 @@
 
 ## Core Principles
 
-### I. MCP-Native Interface
+### I. Service-First Architecture
 
-In **production**, the user-facing external interface MUST be exclusively
-MCP tools and resources. No parallel REST API or alternative client-facing
-network interface is permitted in production unless explicitly ratified as
-a constitutional amendment.
+All business logic MUST reside exclusively in the **service layer**. The
+REST API and the MCP server are both thin transport adapters over that same
+service layer — neither MUST contain business logic of its own.
 
-In **development and testing**, a local HTTP server exposing the service
-layer is permitted and encouraged. It enables Postman collections, contract
-documentation, and independent validation of business logic before the MCP
-layer is built. This test harness MUST NOT be shipped or reachable in
-production deployments.
+Both the REST API and MCP tools are **first-class production interfaces**:
 
-Internally, MCP tools MUST delegate to a clean service layer (business
-logic, timer services, persistence adapters). That service layer MAY make
-outbound HTTP/API calls to external services where necessary, subject to
-Principle IV (Local-First & Privacy).
+- **REST API**: serves non-Claude clients (web app, mobile, third-party
+  integrations, Postman-based developer workflows). Its Postman collection
+  doubles as the canonical contract documentation for all transports.
+- **MCP tools**: serve Claude as a client, exposing the same underlying
+  operations as natural-language-callable tools.
 
-MCP tool schemas MUST be versioned and documented. Breaking changes to a
-tool's input/output schema MUST trigger a MAJOR version bump of the
-affected tool.
+The service layer MAY make outbound calls to external services where
+necessary, subject to Principle IV (Local-First & Privacy).
 
-**Rationale**: MCP is a transport protocol, not a replacement for sound
-internal architecture. The production restriction bars a redundant
-user-facing REST API that splits the interface surface and doubles
-maintenance burden. The dev/test carve-out recognises that a Postman
-collection over the service layer is the most practical way to document
-and validate contracts before wrapping them in MCP.
+Both transport schemas (REST OpenAPI spec and MCP tool schemas) MUST be
+versioned and documented. Breaking changes to either MUST trigger a MAJOR
+version bump of the affected interface.
+
+**Rationale**: The REST API is not redundant — it is the foundation that
+validates and documents the service layer's contracts. MCP is a second
+transport over that same foundation. Duplicating business logic across
+transports is what creates maintenance burden; a shared service layer
+eliminates it.
 
 ### II. Timer Correctness (NON-NEGOTIABLE)
 
@@ -190,4 +190,4 @@ confirmation (pass / justified violation) in its description. The
 `speckit.analyze` command MUST be run and its output attached or
 summarised before merge approval.
 
-**Version**: 1.0.3 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
+**Version**: 1.1.0 | **Ratified**: 2026-02-22 | **Last Amended**: 2026-02-22
